@@ -1,4 +1,5 @@
 # net
+
 g++ server-pool.cpp -o server
 g++ client.cpp -o client
 sudo apt-get install apache2-utils  安装 ab 测试程序
@@ -8,6 +9,7 @@ g++ server-pool-ab.cpp -o server-ab
 ./server-ab
 
 测试
+```
 ubuntu2004@DESKTOP-OEAU8BF:~$ ab -n 1 -t 10 -c 1  http://127.0.0.1:12345/index.html
 This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -69,3 +71,4 @@ Percentage of the requests served within a certain time (ms)
   98%      0
   99%      0
  100%      1 (longest request)
+```
