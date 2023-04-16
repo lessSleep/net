@@ -1,12 +1,16 @@
 # net
+sudo apt-get install apache2-utils  安装 ab 测试程序
 
+编译基础程序
 g++ server-pool.cpp -o server
 g++ client.cpp -o client
-sudo apt-get install apache2-utils  安装 ab 测试程序
+
 
 编译测试程序
 g++ server-pool-ab.cpp -o server-ab
 ./server-ab
+
+g++ server-epoll-ab.cpp -lpthread -o server-epoll-ab
 
 测试
 ```
@@ -49,7 +53,7 @@ Complete requests:      50000
 Failed requests:        0
 Total transferred:      10000000 bytes
 HTML transferred:       5100000 bytes
-Requests per second:    6911.21 [#/sec] (mean)
+Requests per second:    6911.21 [#/sec] (mean) 2并发  9266.72 [#/sec] (mean) 4并发 11528.66 [#/sec] (mean)  //epoll 6354.34 [#/sec] (mean)  2并发 8928.99 [#/sec] (mean)  4并发 9935.42 [#/sec] (mean)
 Time per request:       0.145 [ms] (mean)
 Time per request:       0.145 [ms] (mean, across all concurrent requests)
 Transfer rate:          1349.85 [Kbytes/sec] received
