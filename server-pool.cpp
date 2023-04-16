@@ -4,7 +4,13 @@
 #include <cstring>
 
 #include <sys/poll.h>
+#include <stdlib.h>
 #include <cstdio>
+
+#define EXIT_FAILURE 1
+#define handle_error(msg) \
+    do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 
 int main() {
     // 创建 socket
@@ -15,7 +21,8 @@ int main() {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(12345);
-    bind(serverSocket, (sockaddr*)&serverAddr, sizeof(serverAddr));
+    if (bind(serverSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) 
+       handle_error("bind");
 
     // 监听 socket
     listen(serverSocket, 10);
