@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -6,11 +7,23 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <errno.h>
-#include "util.h"
 
 #define MAX_EVENTS 1024
 #define READ_BUFFER 1024
 // https://github.com/yuesong-feng/30dayMakeCppServer/blob/main/code/day03/server.cpp
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void errif(bool condition, const char *errmsg){
+    if(condition){
+        perror(errmsg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+
 void setnonblocking(int fd){
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 }
@@ -61,12 +74,13 @@ int main() {
                 epoll_ctl(epfd, EPOLL_CTL_ADD, clnt_sockfd, &ev);
             } else if(events[i].events & EPOLLIN){      //可读事件
                 char buf[READ_BUFFER];
+                size_t wlen = 0;
                 while(true){    //由于使用非阻塞IO，读取客户端buffer，一次读取buf大小数据，直到全部读取完毕
                     bzero(&buf, sizeof(buf));
                     ssize_t bytes_read = read(events[i].data.fd, buf, sizeof(buf));
                     if(bytes_read > 0){
                         printf("message from client fd %d: %s\n", events[i].data.fd, buf);
-                        write(events[i].data.fd, buf, sizeof(buf));
+                        wlen = write(events[i].data.fd, buf, sizeof(buf));
                     } else if(bytes_read == -1 && errno == EINTR){  //客户端正常中断、继续读取
                         printf("continue reading");
                         continue;
