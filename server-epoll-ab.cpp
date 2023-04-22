@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #define PORT 12345
-#define MAXFDS 5000
+#define MAXFDS 256
 #define EVENTSIZE 100
 
 #define BUFFER "HTTP/1.1 200 OK\r\nContent-Length: 102\r\nConnection: close\r\nContent-Type: text/html;charset=utf-8\r\n\r\n <html> 响应数据 <head> <title>HTTP响应示例<title> </head>  <body> Hello HTTP! </body> </html>"
@@ -45,12 +45,14 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "socket failed/n");
     return -1;
   }
-  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(opt));
 
+// 设置socket，不用看的代码
+  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(opt));
   memset(&sin, 0, sizeof(struct sockaddr_in));
   sin.sin_family = AF_INET;
   sin.sin_port = htons((short)(PORT));
   sin.sin_addr.s_addr = INADDR_ANY;
+
   if (bind(fd, (struct sockaddr *)&sin, sizeof(sin)) != 0) {
     fprintf(stderr, "bind failed/n");
     return -1;
@@ -113,3 +115,25 @@ void *serv_epoll(void *p) {
   }
   return NULL;
 }
+// g++ server-epoll-ab.cpp -O3 -lpthread
+// Concurrency Level:      4
+// Time taken for tests:   5.017 seconds
+// Complete requests:      50000
+// Failed requests:        0
+// Total transferred:      10000000 bytes
+// HTML transferred:       5100000 bytes
+// Requests per second:    9965.29 [#/sec] (mean)
+// Time per request:       0.401 [ms] (mean)
+// Time per request:       0.100 [ms] (mean, across all concurrent requests)
+// Transfer rate:          1946.35 [Kbytes/sec] received
+
+// Concurrency Level:      4
+// Time taken for tests:   4.699 seconds
+// Complete requests:      50000
+// Failed requests:        0
+// Total transferred:      10000000 bytes
+// HTML transferred:       5100000 bytes
+// Requests per second:    10640.99 [#/sec] (mean)
+// Time per request:       0.376 [ms] (mean)
+// Time per request:       0.094 [ms] (mean, across all concurrent requests)
+// Transfer rate:          2078.32 [Kbytes/sec] received
